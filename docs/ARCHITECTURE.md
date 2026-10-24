@@ -17,6 +17,13 @@
 - The simulator tracks only its own in-memory paper cash and token quantities. It does not persist state or infer inventory from observed public trades.
 - Orders are rejected for stale/future quotes or intents, insufficient displayed depth, insufficient cash/inventory, binary-token price bounds, configured limits, or kill-switch activation.
 
+## Storage and numeric rules
+
+- `ResearchStore` holds one SQLite connection for its lifetime (required for `:memory:`), uses WAL for file databases, and records `PRAGMA user_version` so future migrations can detect the schema.
+- Ingestion writes batches in a single transaction; `finish_run` is idempotent and never flips a finished run.
+- All external numbers pass through `numeric.parse_decimal` / `parse_int`: finite, bounded (`< 1e15`), and never a bare `OverflowError`/`InvalidOperation`. Without the bound, one hostile row can poison every later aggregate.
+- Paper fills require a strictly positive execution price.
+
 ## Engineering boundaries
 
 - External I/O is behind clients that can be replaced by deterministic mocks.
