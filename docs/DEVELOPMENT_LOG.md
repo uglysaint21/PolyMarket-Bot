@@ -1,18 +1,18 @@
 # Development log
 
-This file records meaningful repository changes, decisions, validation, and known limitations. Add an entry for each substantial PR.
+Record each substantial change, decisions, validation, and known limitations here.
 
-## 2026-10-24 — Initial repository foundation (PR #1)
+## 2026-10-24 — Initial repository foundation
 
-- Confirmed the connected GitHub integration can create branches, write files, and open pull requests.
-- Added a minimal Python 3.11+ package with a read-only Polymarket Data API v2 client and a JSONL export CLI.
-- Added mock-based tests for cursor pagination, repeated query filters, malformed responses, and invalid time windows.
-- Added CI for Python 3.11, 3.12, and 3.13, plus architecture, API-reference, and security documentation.
-- Trading, order submission, signing, transfers, and private-key handling remain out of scope.
-- Validation for this repository revision: run `python -m pip install -e '.[dev]'`, `python -m compileall -q src tests`, and `python -m pytest`. CI results must be checked after GitHub runs; no remote run is assumed successful until observed.
+- Added Python 3.11+ package, read-only Data API v2 client, JSONL export CLI, mocked API tests, CI, and architecture/API/security docs.
+- Confirmed branch, file-write, and PR permissions. Work is isolated on `feat/project-foundation`; `main` has not been changed.
+- GitHub Actions for the initial foundation passed on Python 3.11, 3.12, and 3.13.
 
-## Known limitations
+## 2026-10-24 — Normalization, idempotent storage, analytics, and paper controls
 
-- The client exports raw public rows; it does not yet normalize them, persist them, reconcile positions, or calculate P&L.
-- No live API smoke test has been performed in CI or as part of this initial foundation.
-- API response contracts and rate limits must be re-verified against the official documentation before production use.
+- Added immutable normalized trade observations with deterministic SHA-256 IDs and strict validation for timestamp, side, asset, price, size, and wallet.
+- Added SQLite trade storage, duplicate suppression, ingestion-run counters/status, invalid-row counts, and activity-only reports.
+- Added a deterministic paper engine with quote freshness, market matching, depth, cash, inventory, price-bound, size, notional, position, fee, slippage, and kill-switch controls.
+- Added `sync-trades`, `report`, and `paper-sim` CLI commands and deterministic tests.
+- Account-level reconciliation remains explicitly unimplemented: wallet trades alone are not a complete position ledger. No live API smoke test, live orders, signing, or fund movement was performed.
+- Validation is pending for the new commit until GitHub Actions completes. The existing foundation CI run passed all three Python versions.
