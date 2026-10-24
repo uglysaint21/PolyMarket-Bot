@@ -1,0 +1,3 @@
+{"timestamp": 1800000000, "market_id": "token-yes", "side": "BUY", "quantity": "4", "quote": {"market_id": "token-yes", "timestamp": 1800000000, "bid": "0.48", "ask": "0.50", "bid_size": "20", "ask_size": "20"}}
+{"timestamp": 1800000001, "market_id": "token-yes", "side": "SELL", "quantity": "2", "quote": {"market_id": "token-yes", "timestamp": 1800000001, "bid": "0.52", "ask": "0.54", "bid_size": "20", "ask_size": "20"}}
+{"timestamp": 1800000002, "market_id": "token-yes", "side": "SELL", "quantity": "9", "quote": {"market_id": "token-yes", "timestamp": 1800000002, "bid": "0.52", "ask": "0.54", "bid_size": "20", "ask_size": "20"}}

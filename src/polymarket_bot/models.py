@@ -5,18 +5,10 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from typing import Any
 
-
-def _decimal(value: Any, field: str) -> Decimal:
-    try:
-        result = Decimal(str(value))
-    except (InvalidOperation, ValueError, TypeError) as exc:
-        raise ValueError(f"{field} must be numeric") from exc
-    if not result.is_finite():
-        raise ValueError(f"{field} must be finite")
-    return result
+from .numeric import parse_decimal, parse_int
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,13 +32,10 @@ class TradeEvent:
         return self.price * self.size
 
     @classmethod
-    def from_raw(cls, raw: dict[str, Any], *, wallet_hint: str = "") -> "TradeEvent":
+    def from_raw(cls, raw: dict[str, Any], *, wallet_hint: str = "") -> TradeEvent:
         if not isinstance(raw, dict):
             raise ValueError("trade row must be an object")
-        try:
-            timestamp = int(raw["timestamp"])
-        except (KeyError, TypeError, ValueError) as exc:
-            raise ValueError("timestamp is missing or invalid") from exc
+        timestamp = parse_int(raw.get("timestamp"), "timestamp")
         # Some upstream fixtures may use milliseconds; normalize to seconds.
         if timestamp > 100_000_000_000:
             timestamp //= 1000
@@ -58,8 +47,8 @@ class TradeEvent:
         asset_id = str(raw.get("asset", raw.get("asset_id", ""))).strip()
         if not asset_id:
             raise ValueError("asset/asset_id is missing")
-        price = _decimal(raw.get("price"), "price")
-        size = _decimal(raw.get("size"), "size")
+        price = parse_decimal(raw.get("price"), "price")
+        size = parse_decimal(raw.get("size"), "size")
         if not Decimal("0") <= price <= Decimal("1"):
             raise ValueError("price must be between 0 and 1")
         if size <= 0:
